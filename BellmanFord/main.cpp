@@ -1,7 +1,7 @@
 #include <cstdio>
-int DocFile();
+int Input();
 int BellmanFord();
-int GhiKQ();
+int Output();
 
 /* ================================================================================= */
 
@@ -18,15 +18,15 @@ mang d, trace;
 
 int main()
 {
-    DocFile();
+    Input();
     BellmanFord();
-    GhiKQ();
+    Output();
 }
 
 /* ================================================================================= */
 /* ================================================================================= */
 
-int DocFile()
+int Input()
 {
     freopen("BELLMANFORD.INP", "r", stdin);
     scanf("%i %i %i %i", &n, &m, &s, &t);
@@ -36,7 +36,7 @@ int DocFile()
 
 /* ------------------------------------ */
 
-int GhiKQ()
+int Output()
 {
     printf("%i\n", d[t]);
     mang st;    int top=0;
