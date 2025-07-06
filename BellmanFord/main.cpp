@@ -1,3 +1,21 @@
+/***********************************************************************************
+ *  Bellman-Ford Shortest Path Algorithm
+ * ---------------------------------------------------------------------------------
+ *  This program reads a directed weighted graph and computes the shortest path
+ * from a source vertex to a target vertex using the Bellman-Ford algorithm.
+ * 
+ *  Key Features:
+ *   - Handles graphs with negative edge weights.
+ *   - Detects shortest distances using edge relaxation.
+ *   - Traces and prints the actual shortest path from source to target.
+ *   - Assumes no negative weight cycles.
+ * 
+ * Time Complexity:
+ *      O(n * m), where n is the number of vertices and m is the number of edges
+ * Space Complexity:
+ *      O(n + m)
+ ***********************************************************************************/
+
 #include <cstdio>
 
 int Input();
@@ -32,6 +50,21 @@ int main()
 /* ================================================================================= */
 /* ================================================================================= */
 
+/***********************************************************************************
+ *  Input Format (from file "BELLMANFORD.INP"):
+ *      n m s t
+ *      u1 v1 c1
+ *      u2 v2 c2
+ *      ...
+ *      um vm cm
+ *  Where:
+ *      n  = number of vertices
+ *      m  = number of edges
+ *      s  = source vertex (1-based index)
+ *      t  = target vertex (1-based index)
+ *      (ui, vi, ci) are the directed edges with cost ci
+ ***********************************************************************************/
+
 int Input() 
 {
     freopen("BELLMANFORD.INP", "r", stdin);
@@ -44,8 +77,11 @@ int Input()
     return 0;
 }
 
-/* ------------------------------------ */
-
+/***********************************************************************************
+ *  Output:
+ *  - Shortest distance from s to t
+ *  - The path from s to t as a sequence of vertices
+ **********************************************************************************/
 int Output() 
 {
     printf("%d\n", distance[target]);
@@ -104,6 +140,6 @@ int BellmanFord() {
 
         if (!updated) break;
     }
-    
+
     return 0;
 }
