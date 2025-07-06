@@ -115,7 +115,8 @@ int Init()
 
 /* ------------------------------------ */
 
-int Relax(int u, int v, int w) {
+int Relax(int u, int v, int w) 
+{
     if (distance[u] != INF && distance[v] > distance[u] + w) {
         distance[v] = distance[u] + w;
         predecessor[v] = u;
@@ -128,7 +129,8 @@ int Relax(int u, int v, int w) {
 
 /* ------------------------------------ */
 
-int BellmanFord() {
+int BellmanFord() 
+{
     Init();
     
     while (true) {
