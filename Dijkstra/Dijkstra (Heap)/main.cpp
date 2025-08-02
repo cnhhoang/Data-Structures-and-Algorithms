@@ -2,163 +2,167 @@
 #include <vector>
 #include <stack>
 using namespace std;
-int DocFile();
-int Dijkstra();
-int GhiKQ();
+
+int readFile();
+int dijkstra();
+int printResult();
 
 /* ================================================================================= */
 
-const int maxn = 10000;
-const int infi = 2000000000;
-typedef int mang[maxn+10];
-typedef bool mangkt[maxn+10];
-typedef vector<int> mangv[maxn+10];
+const int MAXN = 10000;
+const int INF = 2000000000;
+typedef int IntArray[MAXN + 10];
+typedef vector<int> AdjList[MAXN + 10];
 
-mangv a, w;    int n;   // a, w: danh sach ke lan luot chua dinh va trong so
-mang na;                // na[u]=x <=> dinh u co x dinh ke voi no
-int s, t;               // dinh bat dau & ket thuc
+AdjList adj, weight;
+IntArray degree;
+int n;
+int start, target;
 
-mang d, trace;          // d[i]: khoang cach ngan nhat tu s toi t
-                        // trace[u] = v <=> truy vet. Tren duong di ngan nhat tu s toi u la dinh v
-                        // Free[u] = true <=> u chua co dinh nhan
-mang h, pos;    int nh; // h: heap min;   pos[i]=x <=> vi tri cua i trong heap la x.
+IntArray dist, prev;
+IntArray heap, pos;
+int heapSize;
 
 /* ================================================================================= */
 
-int main()
-{
-    DocFile();
-    Dijkstra();
-    GhiKQ();
+int main() {
+    readFile();
+    dijkstra();
+    printResult();
+    return 0;
 }
 
 /* ================================================================================= */
 /* ================================================================================= */
 
-int DocFile()
-{
+int readFile() {
     int u, v, c, m;
     freopen("DIJKSTRA.INP", "r", stdin);
-    scanf("%i %i %i %i", &n, &m, &s, &t);       // n: so dinh;   m: so canh;   s: dinh bat dau;   t: dinh ket thuc
-    for (int i=1; i<=m; i++)
-    {
-        scanf("%i %i %i", &u, &v, &c);          // canh noi tu u toi v co trong so c
-        a[u].push_back(v);  w[u].push_back(c);  // luu: tu u co the toi v voi canh trong so c
-        a[v].push_back(u);  w[v].push_back(c);  // do thi vo huong
-        na[u]++;    na[v]++;
+    scanf("%d %d %d %d", &n, &m, &start, &target);
+    for (int i = 1; i <= m; ++i) {
+        scanf("%d %d %d", &u, &v, &c);
+        adj[u].push_back(v);
+        weight[u].push_back(c);
+        adj[v].push_back(u);
+        weight[v].push_back(c);
+        ++degree[u];
+        ++degree[v];
     }
+    return 0;
 }
 
 /* ------------------------------------ */
 
-int GhiKQ()
-{
-    if (d[t]==infi) {
-        printf("There is no path from %i to %i", s, t);
+int printResult() {
+    if (dist[target] == INF) {
+        printf("There is no path from %d to %d", start, target);
         return 0;
     }
 
-    stack<int>  st;
-    printf("Length of the shortest path: %i\n", d[t]);
-    printf("The path from %i to %i: ", s, t);
-    while (t)   {
-        st.push(t);
-        t = trace[t];
+    stack<int> st;
+    printf("Length of the shortest path: %d\n", dist[target]);
+    printf("The path from %d to %d: ", start, target);
+    int cur = target;
+    while (cur) {
+        st.push(cur);
+        cur = prev[cur];
     }
     while (!st.empty()) {
-        printf("%i ", st.top());
+        printf("%d ", st.top());
         st.pop();
     }
+    return 0;
 }
 
 /* ================================================================================= */
 
-int UpHeap(int i)
-{
+void upHeap(int i) {
     int x = pos[i];
-    while (1)
-    {
-        int c = x/2;
-        if (!c || d[h[c]]<=d[i])
+    while (true) {
+        int parent = x / 2;
+        if (!parent || dist[heap[parent]] <= dist[i])
             break;
-        h[x] = h[c];    pos[h[x]] = x;
-        x = c;
+        heap[x] = heap[parent];
+        pos[heap[x]] = x;
+        x = parent;
     }
-    h[x] = i;   pos[i] = x;
+    heap[x] = i;
+    pos[i] = x;
 }
 
 /* ------------------------------------ */
 
-int DownHeap(int i)
-{
+void downHeap(int i) {
     int x = pos[i];
-    while (1)
-    {
-        int c = x*2;
-        if (c<nh && a[h[c]]>a[h[c+1]])
-            c++;
-        if (c>nh || a[h[c]]>=a[i])
+    while (true) {
+        int child = x * 2;
+        if (child < heapSize && dist[heap[child]] > dist[heap[child + 1]])
+            ++child;
+        if (child > heapSize || dist[heap[child]] >= dist[i])
             break;
-        h[x] = h[c];    pos[h[x]] = x;
-        x = c;
+        heap[x] = heap[child];
+        pos[heap[x]] = x;
+        x = child;
     }
-    h[x] = i;   pos[i] = x;
+    heap[x] = i;
+    pos[i] = x;
 }
 
 /* ------------------------------------ */
 
-int Extract()
-{
-    if (nh==0)  return 0;
-    int res = h[1];
-    h[1] = h[nh--];   pos[h[1]] = 1;
-    if (nh) DownHeap(h[1]);
+int extract() {
+    if (heapSize == 0)
+        return 0;
+    int res = heap[1];
+    heap[1] = heap[heapSize--];
+    pos[heap[1]] = 1;
+    if (heapSize)
+        downHeap(heap[1]);
     return res;
 }
 
 /* ------------------------------------ */
 
-int Insert(int i)
-{
-    h[++nh] = i;    pos[i] = nh;
-    UpHeap(i);
+void insert(int i) {
+    heap[++heapSize] = i;
+    pos[i] = heapSize;
+    upHeap(i);
 }
 
 /* --------------------------------------------------------------------------------- */
 
-int Init()
-{
-    // d, trace & pos
-    for (int i=1; i<=n; i++)    {
-        trace[i] = 0;
-        d[i] = infi;
+void init() {
+    for (int i = 1; i <= n; ++i) {
+        prev[i] = 0;
+        dist[i] = INF;
         pos[i] = 0;
     }
-    d[s] = 0;
+    dist[start] = 0;
 
-    // Khoi tao Heap
-    nh = 1;
-    h[nh] = s;  pos[s] = nh;
+    heapSize = 1;
+    heap[heapSize] = start;
+    pos[start] = heapSize;
 }
 
 /* ------------------------------------ */
 
-int Dijkstra()
-{
-    Init();
-    while (1)
-    {
-        // Tim dinh u chua co dinh va d[u] nho nhat
-        int u = Extract();
-        if (u==0 || u==t)   return 0;   // Neu khong tim duoc duong di || da tim duoc duong di => thoat
+int dijkstra() {
+    init();
+    while (true) {
+        int u = extract();
+        if (u == 0 || u == target)
+            return 0;
 
-        // Cap nhat lai cac nhan khoang cach
-        for (int i=0; i<na[u]; i++)
-            if (d[a[u][i]] > d[u]+w[u][i])  {
-                d[a[u][i]] = d[u]+w[u][i];
-                trace[a[u][i]] = u;
-                if (pos[a[u][i]]==0)    // neu chua ton tai dinh a[u][i] trong heap => them vao
-                    Insert(a[u][i]);
+        for (int i = 0; i < degree[u]; ++i) {
+            int v = adj[u][i];
+            int w = weight[u][i];
+            if (dist[v] > dist[u] + w) {
+                dist[v] = dist[u] + w;
+                prev[v] = u;
+                if (pos[v] == 0)
+                    insert(v);
             }
+        }
     }
+    return 0;
 }
