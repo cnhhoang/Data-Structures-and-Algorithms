@@ -23,8 +23,8 @@ int main() {
     cin >> n;
     
     vector<int> arr(n);
-    for (int i = 0; i < n; i++) {
-        cin >> arr[i];
+    for (auto& element : arr) {
+        cin >> element;
     }
     
     // Create Binary Indexed Tree from array
@@ -42,7 +42,7 @@ int main() {
             bit.update(u, v);
         } else {
             // Query: Get sum from u to v
-            cout << bit.rangeQuery(u, v) << endl;
+            cout << bit.rangeQuery(u, v) << '\n';
         }
     }
     
