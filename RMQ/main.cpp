@@ -2,77 +2,43 @@
     Complexity:
         + Initialize: O(nlogn)
         + Query: O(1)
+    
+    Using header-only RMQ library with 0-based indexing
 */
 
 #include <cstdio>
-#include <cmath>
-#include <iostream>
-using namespace std;
+#include <vector>
+#include "RMQ.cpp"  // Include the header-only library
 
-int Input();
-int Solve();
-
-/* ================================================================================= */
-/* ================================================================================= */
-
-const int maxn = 50000;
-const int maxk = log2(maxn);
-typedef int array[maxn+10];
-typedef int array2d[maxn+10][maxk+10];
-
-array a; int n, m;
-array2d s;
-
-/* ================================================================================= */
-/* ================================================================================= */
-
-int main()
-{
-    Input();
-    Solve();
-}
-
-/* ================================================================================= */
-/* ================================================================================= */
-
-int Input()
-{
+int main() {
     freopen("RMQ.INP", "r", stdin);
-    scanf("%i", &n);
-    for (int i=1; i<=n; i++)
-        scanf("%i", &a[i]);
-}
-
-/* ================================================================================= */
-
-int RMQ()
-{
-    // s[i][j]: gia tri lon nhat cua doan bat dau tu i va co j phan tu
-    // Khoi tao
-    for (int i=1; i<=n; i++)
-        s[i][0] = a[i];
-
-    // Quy hoach dong
-    for (int j=1; (1<<j)<=n; j++)
-        for (int i=1; i-1+(1<<j) <= n; i++)
-            s[i][j] = max(s[i][j-1], s[i+(1<<(j-1))][j-1]);
-}
-
-/* ----------------------------------- */
-
-int Solve()
-{
-    RMQ(); // Khoi tao bang gia tri
-
-    // Tra loi truy van
-    int u, v, k, res;
-    scanf("%i", &m);
-
-    for (int i=1; i<=m; i++)    {
-        scanf("%i %i", &u, &v);
-
-        k = log2(v-u+1);
-        res = max (s[u][k], s[v-(1<<k)+1][k]);
-        printf("%i\n", res);
+    
+    // Read array size and elements
+    int n;
+    scanf("%d", &n);
+    
+    std::vector<int> arr(n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
     }
+    
+    // Create RMQ instance using the header-only library
+    RMQ rmq(arr);
+    
+    // Process queries
+    int m;
+    scanf("%d", &m);
+    
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        scanf("%d %d", &u, &v);
+        
+        // Convert from 1-based to 0-based indexing
+        u--; v--;
+        
+        int result = rmq.query(u, v);
+        printf("%d\n", result);
+    }
+    
+    return 0;
 }
